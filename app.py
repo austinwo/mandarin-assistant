@@ -2,9 +2,11 @@ import json
 from pathlib import Path
 
 from flask import Flask, render_template, request
-from sentence_transformers import SentenceTransformer, util
+from sentence_transformers import SentenceTransformer
+import chromadb
+from chromadb.config import Settings
 
-# ----- Load data -----
+# ----- Paths & data -----
 BASE_DIR = Path(__file__).parent
 DATA_PATH = BASE_DIR / "phrases.json"
 
@@ -14,69 +16,69 @@ with open(DATA_PATH, "r", encoding="utf-8") as f:
 if not phrases:
     raise ValueError("phrases.json is empty – add some entries first.")
 
-# ----- Load model & embeddings -----
+# ----- Embedding model -----
 model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-mpnet-base-v2")
 
-# ----- Build sentences + index mapping -----
-# sentences: list of all English triggers (main + variants)
-# sentence_owner: for each sentence, which phrase index it belongs to
-sentences = []
-sentence_owner = []
+# ----- Chroma client -----
+client = chromadb.PersistentClient(
+    path=str(BASE_DIR / "chroma_db"),
+    settings=Settings(anonymized_telemetry=False),
+)
 
-for i, p in enumerate(phrases):
-    # main canonical English sentence
-    sentences.append(p["en"])
-    sentence_owner.append(i)
+def rebuild_index():
+    """Drop and rebuild the Chroma collection from phrases.json."""
+    # delete old collection if it exists
+    try:
+        client.delete_collection("phrases")
+    except Exception:
+        pass  # first run or already gone, ignore
 
-    # optional variants
-    for v in p.get("en_variants", []):
-        sentences.append(v)
-        sentence_owner.append(i)
+    collection = client.create_collection(name="phrases")
 
-# Precompute embeddings for all triggers
-embeddings = model.encode(sentences, convert_to_tensor=True)
+    ids = []
+    docs = []
+    metadatas = []
+
+    for i, p in enumerate(phrases):
+        # main English sentence
+        ids.append(f"{i}-0")
+        docs.append(p["en"])
+        metadatas.append({"phrase_index": i, "source": "en"})
+
+        # optional English variants
+        for j, v in enumerate(p.get("en_variants", []), start=1):
+            ids.append(f"{i}-{j}")
+            docs.append(v)
+            metadatas.append({"phrase_index": i, "source": "en_variant"})
+
+    embeddings = model.encode(docs, convert_to_numpy=True).tolist()
+
+    collection.add(
+        ids=ids,
+        documents=docs,
+        metadatas=metadatas,
+        embeddings=embeddings,
+    )
+
+    client.persist()
+    return collection
+
+# build fresh collection on every startup
+collection = rebuild_index()
 
 def query(q: str):
-    """
-    Given an English query, find the closest sentence embedding,
-    then map that back to the corresponding phrase entry.
-    """
-    q_emb = model.encode(q, convert_to_tensor=True)
-    scores = util.cos_sim(q_emb, embeddings)[0]
-    best_flat_idx = scores.argmax().item()
+    """Query Chroma using an embedding from the same SentenceTransformer."""
+    if not q.strip():
+        return None, None
 
-    # Map from flattened sentence index -> phrase index
-    phrase_idx = sentence_owner[best_flat_idx]
-    return phrases[phrase_idx], float(scores[best_flat_idx])
+    q_emb = model.encode([q], convert_to_numpy=True).tolist()
+    res = collection.query(query_embeddings=q_emb, n_results=1)
 
-# ----- Flask app -----
-app = Flask(__name__)
+    if not res["metadatas"] or not res["metadatas"][0]:
+        return None, None
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    result = None
-    score = None
-    user_input = ""
+    meta = res["metadatas"][0][0]
+    distance = res["distances"][0][0]
+    phrase_idx = meta["phrase_index"]
 
-    if request.method == "POST":
-        user_input = request.form.get("query", "").strip()
-        if user_input:
-            match, s = query(user_input)
-
-            # Build a clean result object for the template,
-            result = {
-                "en": match.get("en"),
-                "thai": match.get("thai"),
-                "zh": match.get("zh"),
-                "zh_trad": match.get("zh_trad"),
-                "pinyin": match.get("pinyin"),
-                "zh_thai": match.get("zh_thai"),
-            }
-
-            score = round(float(s), 4)  # nicer display
-
-    return render_template("index.html", result=result, score=score, user_input=user_input)
-
-if __name__ == "__main__":
-    # debug=True is fine on your local dev box
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    return phrases[phrase_idx], distance
