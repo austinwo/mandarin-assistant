@@ -1,12 +1,11 @@
 import json
 from pathlib import Path
+from random import choice
 
 from flask import Flask, render_template, request
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
-from random import choice
-
 
 # ----- Config -----
 BASE_DIR = Path(__file__).parent
@@ -45,7 +44,6 @@ def rebuild_index():
     Drop and rebuild the Chroma collection from phrases.json.
     This guarantees the DB always matches your dataset.
     """
-    # delete old collection if exists
     try:
         client.delete_collection(COLLECTION_NAME)
     except Exception:
@@ -100,23 +98,19 @@ def query(q: str, top_k: int = TOP_K):
         n_results=top_k,
     )
 
-    # safety checks
     if not res.get("metadatas") or not res["metadatas"][0]:
         return None, None, []
 
     metadatas = res["metadatas"][0]
     distances = res["distances"][0]
 
-    # convert distances -> similarities
     sims = [1.0 - float(d) for d in distances]
     phrase_indices = [m["phrase_index"] for m in metadatas]
 
-    # best match
     best_phrase_idx = phrase_indices[0]
     best_sim = sims[0]
     best_phrase = phrases[best_phrase_idx]
 
-    # build suggestion list of unique canonical EN phrases
     seen = set()
     suggestions = []
     for idx in phrase_indices:
@@ -141,21 +135,30 @@ def index():
     suggestions = []
 
     if request.method == "POST":
-        user_input = request.form.get("query", "").strip()
-        if user_input:
-            match, sim, suggestions = query(user_input)
+        action = request.form.get("action", "translate")
 
-            if match is not None and sim is not None:
-                if sim < MIN_SIMILARITY:
-                    # We *did* find something, but confidence is low:
-                    # tell the user and show suggestions instead of pretending nothing happened.
-                    no_good_match = True
-                    score = round(sim, 3)
-                    result = None
-                else:
-                    result = match
-                    score = round(sim, 3)
-                    # suggestions still passed so you can show "other options" if you want
+        if action == "random":
+            # ignore user_input, just pick a random phrase
+            p = choice(phrases)
+            user_input = p["en"]
+            result = p
+            score = None
+            no_good_match = False
+            suggestions = []
+        else:
+            # normal translate flow
+            user_input = request.form.get("query", "").strip()
+            if user_input:
+                match, sim, suggestions = query(user_input)
+
+                if match is not None and sim is not None:
+                    if sim < MIN_SIMILARITY:
+                        no_good_match = True
+                        score = round(sim, 3)
+                        result = None
+                    else:
+                        result = match
+                        score = round(sim, 3)
 
     return render_template(
         "index.html",
@@ -166,20 +169,6 @@ def index():
         suggestions=suggestions,
     )
 
-
-@app.route("/random", methods=["POST"])
-def random_phrase():
-    # Pick a random canonical phrase
-    p = choice(phrases)
-
-    return render_template(
-        "index.html",
-        user_input=p["en"],   # pre-fill the input with the English phrase
-        result=p,             # directly show the translations
-        score=None,           # no similarity score for random
-        no_good_match=False,
-        suggestions=[],       # optional, used by the template
-    )
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
