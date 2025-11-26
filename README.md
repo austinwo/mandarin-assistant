@@ -1,4 +1,5 @@
-<img width="896" height="679" alt="image" src="https://github.com/user-attachments/assets/87185d27-43d3-41cb-9d8f-ed7a13ed6209" />
+<img width="813" height="671" alt="image" src="https://github.com/user-attachments/assets/531847ce-297c-4fec-a444-093288d53bda" />
+
 
 
 # English → Mandarin Assistant
