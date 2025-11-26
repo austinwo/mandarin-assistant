@@ -17,14 +17,37 @@ if not phrases:
 # ----- Load model & embeddings -----
 model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-mpnet-base-v2")
 
-eng_sentences = [p["en"] for p in phrases]
-embeddings = model.encode(eng_sentences, convert_to_tensor=True)
+# ----- Build sentences + index mapping -----
+# sentences: list of all English triggers (main + variants)
+# sentence_owner: for each sentence, which phrase index it belongs to
+sentences = []
+sentence_owner = []
+
+for i, p in enumerate(phrases):
+    # main canonical English sentence
+    sentences.append(p["en"])
+    sentence_owner.append(i)
+
+    # optional variants
+    for v in p.get("en_variants", []):
+        sentences.append(v)
+        sentence_owner.append(i)
+
+# Precompute embeddings for all triggers
+embeddings = model.encode(sentences, convert_to_tensor=True)
 
 def query(q: str):
+    """
+    Given an English query, find he closest sentence embedding,
+    then map that back to the corresponding phrase entry.
+    """
     q_emb = model.encode(q, convert_to_tensor=True)
     scores = util.cos_sim(q_emb, embeddings)[0]
-    best_idx = scores.argmax().item()
-    return phrases[best_idx], float(scores[best_idx])
+    best_flat_idx = scores.argmax().item()
+
+    # Map from flattened sentence index -> phrase index
+    phrase_idx = sentence_owner[best_flat_idx]
+    return phrases[phrase_idx], float(scores[best_flat_idx])
 
 # ----- Flask app -----
 app = Flask(__name__)

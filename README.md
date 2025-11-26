@@ -1,10 +1,10 @@
-# English -> Mandarin Assistant
+# English → Mandarin Assistant
 
 A minimal web app that translates everyday English phrases into:
 - Thai
 - Mandarin Chinese (Simplified)
 - Pinyin
-- Mandarin pronounced using Thai phonetics (ZH-TH)
+- Mandarin pronunciation written using Thai phonetics (ZH-TH)
 
 This is built for real-world communication, not textbook Mandarin.  
 The purpose is to learn how people actually speak in normal conversations with friends, locals, and native speakers.
@@ -18,71 +18,56 @@ The purpose is to learn how people actually speak in normal conversations with f
   - **TH** — Thai
   - **ZH** — Mandarin (Simplified)
   - **Pinyin** — pronunciation
-  - **ZH-TH** — Mandarin pronunciation written using Thai letters
+  - **ZH-TH** — Mandarin pronunciation expressed using Thai letters
 
-This tool helps reinforce pronunciation, context, and memory.
-It is optimized for daily use and casual language, not formal academic material.
+This reinforces pronunciation, meaning, and context. It is optimized for casual social use and memory building, not academic instruction.
 
 ---
 
 ## 🧠 Approach
 
-The current version uses:
-- Sentence embeddings (e.g., MPNet or similar)
-- A phrase dictionary (JSON)
-- Similarity scoring
-- Template-based translation output
+The app uses:
+- Sentence embeddings via SentenceTransformer
+- A curated JSON phrase bank
+- Cosine similarity scoring
+- A simple Flask backend and browser UI
+
+Every phrase is intentional and context-aware. No hallucinated translations.
 
 Goals moving forward:
-- Expand the phrase dataset
-- Improve pronunciation mapping
-- Introduce conversational memory
-- Support slang, casual speech, and nightlife vocabulary
-- Allow voice input and audio output
+- Expand the phrase library
+- Improve ZH-TH phonetic accuracy
+- Add slang, nightlife, and culture-specific expressions
+- Support conversational memory
+- Allow voice input and text-to-speech output
 
-This project is intentionally iterative.  
-The goal is to ship early, then improve repeatedly.
+This project is iterative by design: ship early, improve constantly.
 
 ---
 
-## 🛠️ Setup
+## 🛠️ Setup (Poetry)
 
-### Create a virtual environment
-```bash
-python -m venv venv
-```
+This project uses Poetry. Do not install pip packages globally.
 
-### Activate the environment
+1. Install dependencies:
+   poetry install
 
-macOS / Linux:
-```bash
-source venv/bin/activate
-```
+2. Activate environment:
+   poetry shell
 
-Windows:
-```bash
-venv\Scripts\activate
-```
+3. Run the backend:
+   poetry run python app.py
 
-### Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### Run the backend
-```bash
-python assistant.py
-```
-
-### Open the UI
-Open `index.html` in your browser.
+4. Open the UI:
+   http://localhost:5000
 
 ---
 
 ## 🌱 Roadmap
-- Add Traditional Chinese support
-- Expand phrase bank for slang and nightlife language
+
+- Add Traditional Chinese
+- Expand phrase bank (nightlife, gym, dating, logistics)
 - Improve ZH-TH phonetic mapping accuracy
-- Add context memory (vector DB)
-- Add microphone input and text-to-speech output
-- Deploy to Vercel or small Flask backend
+- Add context memory (vector DB: Chroma, Qdrant, LanceDB, etc.)
+- Microphone input and text-to-speech output
+- Deployment to hosting providers (Vercel, Flask backend, etc.)
