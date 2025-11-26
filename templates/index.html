@@ -23,7 +23,7 @@
           </p>
 
           <!-- INPUT CARD -->
-          <div class="card shadow-lg mb-4 p-4">
+          <div class="card shadow-lg mb-3 p-4">
             <form method="POST">
               <div class="mb-3">
                 <label for="query" class="form-label">What do you want to say?</label>
@@ -39,7 +39,7 @@
                 >
               </div>
 
-              <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex justify-content-between align-items-center gap-3">
                 <button type="submit" class="btn btn-primary">
                   Translate
                 </button>
@@ -50,6 +50,15 @@
                   </span>
                 {% endif %}
               </div>
+            </form>
+          </div>
+
+          <!-- RANDOM PHRASE BUTTON -->
+          <div class="text-center mb-4">
+            <form action="{{ url_for('random_phrase') }}" method="POST">
+              <button type="submit" class="btn btn-outline-secondary btn-lg">
+                🎲 Inspire me — show a random phrase
+              </button>
             </form>
           </div>
 
@@ -88,8 +97,9 @@
               <span class="result-value">{{ result.zh_thai }}</span>
             </div>
           </div>
+
           {% elif no_good_match %}
-          <!-- LOW-CONFIDENCE / NO-GOOD-MATCH CARD -->
+          <!-- LOW-CONFIDENCE / NO-GOOD-MATCH -->
           <div class="alert alert-warning no-match-card" role="alert">
             <h5 class="alert-heading mb-2">Not sure about that one</h5>
             <p class="mb-1">

@@ -5,6 +5,8 @@ from flask import Flask, render_template, request
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
+from random import choice
+
 
 # ----- Config -----
 BASE_DIR = Path(__file__).parent
@@ -164,6 +166,20 @@ def index():
         suggestions=suggestions,
     )
 
+
+@app.route("/random", methods=["POST"])
+def random_phrase():
+    # Pick a random canonical phrase
+    p = choice(phrases)
+
+    return render_template(
+        "index.html",
+        user_input=p["en"],   # pre-fill the input with the English phrase
+        result=p,             # directly show the translations
+        score=None,           # no similarity score for random
+        no_good_match=False,
+        suggestions=[],       # optional, used by the template
+    )
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
