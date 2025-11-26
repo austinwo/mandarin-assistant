@@ -14,6 +14,8 @@ COLLECTION_NAME = "phrases"
 
 # minimum acceptable similarity (0–1)
 MIN_SIMILARITY = 0.60
+TOP_K = 5  # how many nearest neighbors to inspect / suggest
+
 
 # ----- Load phrases -----
 with open(DATA_PATH, "r", encoding="utf-8") as f:
@@ -22,10 +24,12 @@ with open(DATA_PATH, "r", encoding="utf-8") as f:
 if not phrases:
     raise ValueError("phrases.json is empty – add some entries first.")
 
+
 # ----- Embedding model -----
 model = SentenceTransformer(
     "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 )
+
 
 # ----- Chroma client -----
 client = chromadb.PersistentClient(
@@ -42,7 +46,7 @@ def rebuild_index():
     # delete old collection if exists
     try:
         client.delete_collection(COLLECTION_NAME)
-    except:
+    except Exception:
         pass
 
     collection = client.create_collection(name=COLLECTION_NAME)
@@ -63,8 +67,6 @@ def rebuild_index():
 
     embeddings = model.encode(docs, convert_to_numpy=True).tolist()
 
-    print(f"ids {ids}")
-
     collection.add(
         ids=ids,
         documents=docs,
@@ -78,29 +80,50 @@ def rebuild_index():
 collection = rebuild_index()
 
 
-def query(q: str):
+def query(q: str, top_k: int = TOP_K):
+    """
+    Return:
+      - best matching phrase dict (or None)
+      - best similarity (float or None)
+      - list of suggestion strings (English canonical phrases)
+    """
     q = q.strip()
     if not q:
-        return None, None
+        return None, None, []
 
     q_emb = model.encode([q], convert_to_numpy=True).tolist()
 
     res = collection.query(
         query_embeddings=q_emb,
-        n_results=1,
+        n_results=top_k,
     )
 
-    if not res["metadatas"] or not res["metadatas"][0]:
-        return None, None
+    # safety checks
+    if not res.get("metadatas") or not res["metadatas"][0]:
+        return None, None, []
 
-    meta = res["metadatas"][0][0]
-    distance = float(res["distances"][0][0])
+    metadatas = res["metadatas"][0]
+    distances = res["distances"][0]
 
-    # distance = 1 - cosine similarity
-    similarity = 1.0 - distance
-    phrase_idx = meta["phrase_index"]
+    # convert distances -> similarities
+    sims = [1.0 - float(d) for d in distances]
+    phrase_indices = [m["phrase_index"] for m in metadatas]
 
-    return phrases[phrase_idx], similarity
+    # best match
+    best_phrase_idx = phrase_indices[0]
+    best_sim = sims[0]
+    best_phrase = phrases[best_phrase_idx]
+
+    # build suggestion list of unique canonical EN phrases
+    seen = set()
+    suggestions = []
+    for idx in phrase_indices:
+        en = phrases[idx]["en"]
+        if en not in seen:
+            seen.add(en)
+            suggestions.append(en)
+
+    return best_phrase, best_sim, suggestions
 
 
 # ----- Flask -----
@@ -113,18 +136,24 @@ def index():
     result = None
     score = None
     no_good_match = False
+    suggestions = []
 
     if request.method == "POST":
         user_input = request.form.get("query", "").strip()
         if user_input:
-            match, sim = query(user_input)
-            if match:
+            match, sim, suggestions = query(user_input)
+
+            if match is not None and sim is not None:
                 if sim < MIN_SIMILARITY:
+                    # We *did* find something, but confidence is low:
+                    # tell the user and show suggestions instead of pretending nothing happened.
                     no_good_match = True
                     score = round(sim, 3)
+                    result = None
                 else:
                     result = match
                     score = round(sim, 3)
+                    # suggestions still passed so you can show "other options" if you want
 
     return render_template(
         "index.html",
@@ -132,6 +161,7 @@ def index():
         result=result,
         score=score,
         no_good_match=no_good_match,
+        suggestions=suggestions,
     )
 
 

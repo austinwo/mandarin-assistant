@@ -45,7 +45,9 @@
                 </button>
 
                 {% if score is not none %}
-                  <span class="score-pill">Similarity score: {{ score }}</span>
+                  <span class="score-pill">
+                    Similarity: {{ score }}
+                  </span>
                 {% endif %}
               </div>
             </form>
@@ -85,6 +87,32 @@
               <span class="result-label">ZH-TH</span>
               <span class="result-value">{{ result.zh_thai }}</span>
             </div>
+          </div>
+          {% elif no_good_match %}
+          <!-- LOW-CONFIDENCE / NO-GOOD-MATCH CARD -->
+          <div class="alert alert-warning no-match-card" role="alert">
+            <h5 class="alert-heading mb-2">Not sure about that one</h5>
+            <p class="mb-1">
+              I couldn’t find a close match for
+              <strong>"{{ user_input }}"</strong>.
+              {% if score is not none %}
+                (Best match confidence: {{ score }})
+              {% endif %}
+            </p>
+
+            {% if suggestions %}
+              <p class="mb-2">Try one of these instead:</p>
+              <ul class="mb-0">
+                {% for s in suggestions %}
+                  <li>{{ s }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="mb-0">
+                Try rephrasing, or use a more complete sentence like:
+                <em>"I live in Thailand."</em>
+              </p>
+            {% endif %}
           </div>
           {% endif %}
 
