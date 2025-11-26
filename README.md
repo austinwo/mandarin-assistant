@@ -1,3 +1,6 @@
+<img width="896" height="679" alt="image" src="https://github.com/user-attachments/assets/87185d27-43d3-41cb-9d8f-ed7a13ed6209" />
+
+
 # English → Mandarin Assistant
 
 A minimal web app that translates everyday English phrases into:
