@@ -65,7 +65,6 @@ This project uses Poetry. Do not install pip packages globally.
 
 ## 🌱 Roadmap
 
-- Add Traditional Chinese
 - Expand phrase bank (nightlife, gym, dating, logistics)
 - Improve ZH-TH phonetic mapping accuracy
 - Add context memory (vector DB: Chroma, Qdrant, LanceDB, etc.)

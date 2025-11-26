@@ -38,7 +38,7 @@ embeddings = model.encode(sentences, convert_to_tensor=True)
 
 def query(q: str):
     """
-    Given an English query, find he closest sentence embedding,
+    Given an English query, find the closest sentence embedding,
     then map that back to the corresponding phrase entry.
     """
     q_emb = model.encode(q, convert_to_tensor=True)
@@ -62,7 +62,17 @@ def index():
         user_input = request.form.get("query", "").strip()
         if user_input:
             match, s = query(user_input)
-            result = match
+
+            # Build a clean result object for the template,
+            result = {
+                "en": match.get("en"),
+                "thai": match.get("thai"),
+                "zh": match.get("zh"),
+                "zh_trad": match.get("zh_trad"),
+                "pinyin": match.get("pinyin"),
+                "zh_thai": match.get("zh_thai"),
+            }
+
             score = round(float(s), 4)  # nicer display
 
     return render_template("index.html", result=result, score=score, user_input=user_input)
