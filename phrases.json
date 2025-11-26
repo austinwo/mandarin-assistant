@@ -1,6 +1,13 @@
 [
   {
     "en": "Want to drink tonight?",
+    "en_variants": [
+      "Wanna drink tonight?",
+      "Are we drinking tonight?",
+      "Do you want to grab some drinks?",
+      "Are you down to drink later?",
+      "Want to get a drink?"
+    ],
     "thai": "คืนนี้ไปดื่มไหม",
     "zh": "今晚喝酒吗？",
     "pinyin": "jīn wǎn hē jiǔ ma?",
@@ -8,6 +15,13 @@
   },
   {
     "en": "Where do you live?",
+    "en_variants": [
+      "Where are you staying?",
+      "Where are you based?",
+      "Where's home for you?",
+      "Where do you stay?",
+      "Where do you live at?"
+    ],
     "thai": "คุณอยู่ที่ไหน",
     "zh": "你住在哪里？",
     "pinyin": "nǐ zhù zài nǎlǐ?",
@@ -15,6 +29,13 @@
   },
   {
     "en": "I live in the United States.",
+    "en_variants": [
+      "I’m in the US.",
+      "I live in America.",
+      "I’m based in the States.",
+      "I live in the U.S., yeah.",
+      "I’m from Thailand but live in the US."
+    ],
     "thai": "ฉันอยู่ที่อเมริกา",
     "zh": "我住在美国",
     "pinyin": "wǒ zhù zài měiguó",
@@ -22,6 +43,13 @@
   },
   {
     "en": "I am from Thailand.",
+    "en_variants": [
+      "I'm Thai.",
+      "I'm originally from Thailand.",
+      "I was born in Thailand.",
+      "I come from Thailand.",
+      "I'm a Thai guy."
+    ],
     "thai": "ฉันมาจากประเทศไทย",
     "zh": "我来自泰国",
     "pinyin": "wǒ láizì Tàiguó",
@@ -29,6 +57,13 @@
   },
   {
     "en": "Can I add you on WeChat?",
+    "en_variants": [
+      "What's your WeChat?",
+      "Can I scan your WeChat?",
+      "WeChat?",
+      "Add me on WeChat?",
+      "Scan?"
+    ],
     "thai": "ขอแอดวีแชทได้ไหม",
     "zh": "可以加我微信吗？",
     "pinyin": "kěyǐ jiā wǒ Wēixìn ma?",
@@ -36,6 +71,13 @@
   },
   {
     "en": "What time are we meeting?",
+    "en_variants": [
+      "What time are we meeting up?",
+      "When are we meeting?",
+      "What time should we meet?",
+      "What time works for you?",
+      "What time?"
+    ],
     "thai": "เราเจอกันกี่โมง",
     "zh": "我们几点见？",
     "pinyin": "wǒmen jǐ diǎn jiàn?",
@@ -43,6 +85,13 @@
   },
   {
     "en": "Where are we going later?",
+    "en_variants": [
+      "Where are we going after?",
+      "Where are we heading later?",
+      "Where to later?",
+      "Where do we go next?",
+      "What's the plan later?"
+    ],
     "thai": "เดี๋ยวเราจะไปไหนกัน",
     "zh": "等下我们去哪儿？",
     "pinyin": "děngxià wǒmen qù nǎr?",
@@ -50,6 +99,13 @@
   },
   {
     "en": "Don't get too drunk.",
+    "en_variants": [
+      "Don't get wasted.",
+      "Don't get too tipsy.",
+      "Don’t drink too much.",
+      "Don’t get blackout.",
+      "Take it slow ok?"
+    ],
     "thai": "อย่าเมามากนะ",
     "zh": "不要喝太醉。",
     "pinyin": "búyào hē tài zuì.",
@@ -57,6 +113,13 @@
   },
   {
     "en": "Let's grab dinner first.",
+    "en_variants": [
+      "Let's eat first.",
+      "Let’s grab food first.",
+      "Let's get dinner first.",
+      "Food first, then drinks.",
+      "Let’s get something to eat."
+    ],
     "thai": "ไปกินข้าวก่อน",
     "zh": "我们先吃饭吧。",
     "pinyin": "wǒmen xiān chī fàn ba.",
@@ -64,6 +127,13 @@
   },
   {
     "en": "Send me your location.",
+    "en_variants": [
+      "Send your location.",
+      "Drop your location.",
+      "Share your live location.",
+      "Send your pin.",
+      "Send me the pin."
+    ],
     "thai": "ส่งโลเคชันมา",
     "zh": "把定位发给我。",
     "pinyin": "bǎ dìngwèi fā gěi wǒ.",
@@ -71,6 +141,13 @@
   },
   {
     "en": "What do you do for work?",
+    "en_variants": [
+      "What do you do?",
+      "What’s your job?",
+      "What do you work as?",
+      "What field are you in?",
+      "What's your work?"
+    ],
     "thai": "คุณทำงานอะไร",
     "zh": "你是做什么工作的？",
     "pinyin": "nǐ shì zuò shénme gōngzuò de?",
@@ -78,6 +155,13 @@
   },
   {
     "en": "How old are you?",
+    "en_variants": [
+      "What’s your age?",
+      "How old are you btw?",
+      "How old are you actually?",
+      "Age?",
+      "How old?"
+    ],
     "thai": "คุณอายุเท่าไหร่",
     "zh": "你多大了？",
     "pinyin": "nǐ duō dà le?",
@@ -85,6 +169,13 @@
   },
   {
     "en": "Do you live alone?",
+    "en_variants": [
+      "Do you stay alone?",
+      "Do you live by yourself?",
+      "Are you living alone?",
+      "Do you have roommates?",
+      "Are you on your own?"
+    ],
     "thai": "อยู่คนเดียวไหม",
     "zh": "你一个人住吗？",
     "pinyin": "nǐ yí gè rén zhù ma?",
@@ -92,6 +183,13 @@
   },
   {
     "en": "Do you speak English?",
+    "en_variants": [
+      "Can you speak English?",
+      "Do you know English?",
+      "You speak English?",
+      "Is your English okay?",
+      "Can you talk English a little?"
+    ],
     "thai": "คุณพูดภาษาอังกฤษได้ไหม",
     "zh": "你会说英语吗？",
     "pinyin": "nǐ huì shuō Yīngyǔ ma?",
@@ -99,6 +197,13 @@
   },
   {
     "en": "Do you speak Chinese?",
+    "en_variants": [
+      "Can you speak Chinese?",
+      "Do you know Chinese?",
+      "You speak Chinese?",
+      "Is your Chinese okay?",
+      "Can you talk Chinese a little?"
+    ],
     "thai": "คุณพูดภาษาจีนได้ไหม",
     "zh": "你会说中文吗？",
     "pinyin": "nǐ huì shuō Zhōngwén ma?",
@@ -106,6 +211,13 @@
   },
   {
     "en": "You're cute.",
+    "en_variants": [
+      "You’re adorable.",
+      "You’re really cute.",
+      "You look cute.",
+      "You’re kinda cute.",
+      "Cute."
+    ],
     "thai": "คุณน่ารัก",
     "zh": "你很可爱。",
     "pinyin": "nǐ hěn kě ài.",
@@ -113,6 +225,13 @@
   },
   {
     "en": "You're hot.",
+    "en_variants": [
+      "You’re handsome.",
+      "You’re sexy.",
+      "You’re fine as hell.",
+      "You’re really attractive.",
+      "You’re cute and hot."
+    ],
     "thai": "คุณฮอตมาก",
     "zh": "你很帅。",
     "pinyin": "nǐ hěn shuài.",
@@ -120,6 +239,13 @@
   },
   {
     "en": "We look good together.",
+    "en_variants": [
+      "We match.",
+      "We vibe.",
+      "We’re a good fit.",
+      "We look right together.",
+      "We go well together."
+    ],
     "thai": "เราเข้ากันดีนะ",
     "zh": "我们很配。",
     "pinyin": "wǒmen hěn pèi.",
@@ -127,6 +253,13 @@
   },
   {
     "en": "Are you done with this machine?",
+    "en_variants": [
+      "Are you done with this?",
+      "You finished here?",
+      "You still using this?",
+      "Is this machine free?",
+      "Can I jump in?"
+    ],
     "thai": "เครื่องนี้คุณใช้เสร็จยัง",
     "zh": "这个器械你用完了吗？",
     "pinyin": "zhège qìxiè nǐ yòng wán le ma?",
@@ -134,6 +267,13 @@
   },
   {
     "en": "I'll spot you.",
+    "en_variants": [
+      "I got you.",
+      "Want me to spot you?",
+      "Need a spot?",
+      "I can spot.",
+      "I'll help."
+    ],
     "thai": "เดี๋ยวผมช่วยสปอตให้",
     "zh": "我帮你。",
     "pinyin": "wǒ bāng nǐ.",
@@ -141,6 +281,13 @@
   },
   {
     "en": "I'm bulking.",
+    "en_variants": [
+      "I'm bulking rn.",
+      "I'm in bulk season.",
+      "I'm gaining weight.",
+      "I'm putting on mass.",
+      "I'm in a calorie surplus."
+    ],
     "thai": "ผมกำลังเพิ่มน้ำหนัก",
     "zh": "我在增肌。",
     "pinyin": "wǒ zài zēng jī.",
@@ -148,6 +295,13 @@
   },
   {
     "en": "I'm cutting.",
+    "en_variants": [
+      "I'm leaning out.",
+      "I'm trimming down.",
+      "I'm shredding.",
+      "I'm dropping fat.",
+      "I'm dieting down."
+    ],
     "thai": "ผมกำลังลดไขมัน",
     "zh": "我在减脂。",
     "pinyin": "wǒ zài jiǎn zhī.",
@@ -155,6 +309,13 @@
   },
   {
     "en": "Let's do legs today.",
+    "en_variants": [
+      "Leg day?",
+      "We doing legs today?",
+      "Legs today.",
+      "Let's hit legs.",
+      "Let's train legs."
+    ],
     "thai": "วันนี้เล่นขากัน",
     "zh": "今天练腿吧。",
     "pinyin": "jīntiān liàn tuǐ ba.",
@@ -162,6 +323,13 @@
   },
   {
     "en": "Is it far?",
+    "en_variants": [
+      "How far is it?",
+      "Is it close?",
+      "Is it near?",
+      "Is it a long way?",
+      "Is it far away?"
+    ],
     "thai": "ไกลไหม",
     "zh": "远吗？",
     "pinyin": "yuǎn ma?",
@@ -169,6 +337,13 @@
   },
   {
     "en": "I'm lost.",
+    "en_variants": [
+      "I can’t find it.",
+      "I think I’m lost.",
+      "I’m confused where I am.",
+      "I’m off-track.",
+      "I’m turned around."
+    ],
     "thai": "ผมหลงทาง",
     "zh": "我迷路了。",
     "pinyin": "wǒ mí lù le.",
@@ -176,6 +351,13 @@
   },
   {
     "en": "I'm waiting outside.",
+    "en_variants": [
+      "I'm outside.",
+      "I’m here.",
+      "I'm outside waiting.",
+      "I'm already outside.",
+      "I’m out front."
+    ],
     "thai": "ผมรออยู่ข้างนอก",
     "zh": "我在外面等你。",
     "pinyin": "wǒ zài wàimiàn děng nǐ.",
@@ -183,6 +365,13 @@
   },
   {
     "en": "Send me the address.",
+    "en_variants": [
+      "Send address.",
+      "Drop the address.",
+      "Send me the addy.",
+      "Give me the address.",
+      "Send the location."
+    ],
     "thai": "ส่งที่อยู่มา",
     "zh": "把地址发给我。",
     "pinyin": "bǎ dìzhǐ fā gěi wǒ.",
@@ -190,55 +379,27 @@
   },
   {
     "en": "How do I get there?",
+    "en_variants": [
+      "How do I go there?",
+      "What's the route?",
+      "How should I go?",
+      "How do I reach there?",
+      "How do I find it?"
+    ],
     "thai": "ไปยังไง",
     "zh": "怎么去那里？",
     "pinyin": "zěnme qù nàlǐ?",
     "zh_thai": "เจิ่นเมอะ ชวี่ น่าหลี่?"
   },
   {
-    "en": "Do you speak English?",
-    "thai": "คุณพูดภาษาอังกฤษได้ไหม",
-    "zh": "你会说英语吗？",
-    "pinyin": "nǐ huì shuō Yīngyǔ ma?",
-    "zh_thai": "หนี่ ฮุ่ย ซัว อิงอวี่ มะ?"
-  },
-  {
-    "en": "I speak Thai.",
-    "thai": "ฉันพูดภาษาไทย",
-    "zh": "我会说泰语。",
-    "pinyin": "wǒ huì shuō Tàiyǔ.",
-    "zh_thai": "หว่อ ฮุ่ย ซัว ไท่ยวี่"
-  },
-  {
-    "en": "I'm Thai but I live in the USA.",
-    "thai": "ผมเป็นคนไทยแต่ผมอยู่ที่อเมริกา",
-    "zh": "我是泰国人，但我住在美国。",
-    "pinyin": "wǒ shì Tàiguó rén, dàn wǒ zhù zài měiguó.",
-    "zh_thai": "หว่อ ชื้อ ไท่กวอ เหยิ๋น ต้าน หว่อ จู้ ไจ้ เหมยกวอ"
-  },
-  {
-    "en": "I'm Thai but I live in Las Vegas.",
-    "thai": "ผมเป็นคนไทยแต่ผมอยู่ที่ลาสเวกัส",
-    "zh": "我是泰国人，但我住在拉斯维加斯。",
-    "pinyin": "wǒ shì Tàiguó rén, dàn wǒ zhù zài Lāsī Wéijiāsī.",
-    "zh_thai": "หว่อ ชื้อ ไท่กวอ เหยิ๋น ต้าน หว่อ จู้ ไจ้ ลาซือ เวยเจียสือ"
-  },
-  {
-    "en": "I live in the USA.",
-    "thai": "ผมอยู่ที่อเมริกา",
-    "zh": "我住在美国。",
-    "pinyin": "wǒ zhù zài měiguó.",
-    "zh_thai": "หว่อ จู้ ไจ้ เหมยกวอ"
-  },
-  {
-    "en": "I live in Las Vegas.",
-    "thai": "ผมอยู่ที่ลาสเวกัส",
-    "zh": "我住在拉斯维加斯。",
-    "pinyin": "wǒ zhù zài Lāsī Wéijiāsī.",
-    "zh_thai": "หว่อ จู้ ไจ้ ลาซือ เวยเจียสือ"
-  },
-  {
     "en": "Do you speak Mandarin?",
+    "en_variants": [
+      "Can you speak Mandarin?",
+      "Do you know Mandarin?",
+      "Do you understand Mandarin?",
+      "You speak Mandarin?",
+      "Is your Mandarin okay?"
+    ],
     "thai": "คุณพูดภาษาจีนกลางได้ไหม",
     "zh": "你会说普通话吗？",
     "pinyin": "nǐ huì shuō Pǔtōnghuà ma?",
@@ -246,6 +407,13 @@
   },
   {
     "en": "I speak Mandarin a little bit.",
+    "en_variants": [
+      "I can speak a little Mandarin.",
+      "Just a little Mandarin.",
+      "I know a bit of Mandarin.",
+      "I speak some Mandarin.",
+      "My Mandarin is small small."
+    ],
     "thai": "ผมพูดภาษาจีนได้นิดหน่อย",
     "zh": "我会说一点中文。",
     "pinyin": "wǒ huì shuō yìdiǎn Zhōngwén.",
@@ -253,6 +421,13 @@
   },
   {
     "en": "I am learning Mandarin.",
+    "en_variants": [
+      "I'm studying Mandarin.",
+      "I'm learning Chinese.",
+      "I just started Mandarin.",
+      "I'm practicing Mandarin.",
+      "I'm learning Mandarin rn."
+    ],
     "thai": "ผมกำลังเรียนภาษาจีน",
     "zh": "我在学中文。",
     "pinyin": "wǒ zài xué Zhōngwén.",
@@ -260,6 +435,13 @@
   },
   {
     "en": "I speak English.",
+    "en_variants": [
+      "I can speak English.",
+      "I know English.",
+      "I speak English fine.",
+      "I’m fluent in English.",
+      "Yeah I speak English."
+    ],
     "thai": "ผมพูดภาษาอังกฤษ",
     "zh": "我会说英语。",
     "pinyin": "wǒ huì shuō Yīngyǔ.",
@@ -267,6 +449,13 @@
   },
   {
     "en": "I speak Thai.",
+    "en_variants": [
+      "I can speak Thai.",
+      "Yeah I speak Thai.",
+      "I know Thai.",
+      "I’m Thai, I speak Thai.",
+      "I speak Thai well."
+    ],
     "thai": "ผมพูดภาษาไทย",
     "zh": "我会说泰语。",
     "pinyin": "wǒ huì shuō Tàiyǔ.",
@@ -274,6 +463,13 @@
   },
   {
     "en": "I speak English, Thai and a little bit of Japanese.",
+    "en_variants": [
+      "I speak English, Thai and some Japanese.",
+      "I speak English and Thai, and a little Japanese.",
+      "I know English, Thai, and a bit of Japanese.",
+      "I can talk English and Thai, and a bit of Japanese.",
+      "I speak English, Thai, and Japanese small small."
+    ],
     "thai": "ผมพูดอังกฤษ ไทย และภาษาญี่ปุ่นได้นิดหน่อย",
     "zh": "我会说英语、泰语和一点日语。",
     "pinyin": "wǒ huì shuō Yīngyǔ, Tàiyǔ hé yìdiǎn Rìyǔ.",
@@ -281,6 +477,13 @@
   },
   {
     "en": "Please speak slower.",
+    "en_variants": [
+      "Speak slower please.",
+      "Can you speak slowly?",
+      "Slow down please.",
+      "Talk slower please.",
+      "Say it slower?"
+    ],
     "thai": "พูดช้าหน่อยนะ",
     "zh": "说慢一点好吗？",
     "pinyin": "shuō màn yìdiǎn hǎo ma?",
@@ -288,6 +491,13 @@
   },
   {
     "en": "I'm visiting Taipei.",
+    "en_variants": [
+      "I'm in Taipei right now.",
+      "I'm here in Taipei.",
+      "I'm traveling in Taipei.",
+      "I'm here just visiting.",
+      "I'm staying in Taipei."
+    ],
     "thai": "ผมมาเที่ยวไทเป",
     "zh": "我来台北玩。",
     "pinyin": "wǒ lái Táiběi wán.",
