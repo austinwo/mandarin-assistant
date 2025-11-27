@@ -380,7 +380,22 @@ def index():
 
         else:
             # Normal translate flow.
+            MAX_INPUT_LENGTH = 500
+
             user_input = request.form.get("query", "").strip()
+
+            # Input validation
+            if not user_input:
+                return render_template(
+                    "index.html",
+                    error="Please enter something to translate."
+                )
+
+            if len(user_input) > MAX_INPUT_LENGTH:
+                return render_template(
+                    "index.html",
+                    error=f"Input too long. Maximum {MAX_INPUT_LENGTH} characters."
+                )
 
             if user_input:
                 match, sim, suggestions = query_corpus(user_input)
