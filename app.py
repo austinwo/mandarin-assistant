@@ -1,7 +1,7 @@
 """
 Flask app for an English → Mandarin/Thai assistant with:
 
-- Semantic search over a curated phrase corpus (Chroma + SentenceTransformers).
+- Semantic search over a curated phrase corpus (Chroma + OpenAI embeddings).
 - RAG-style explanations for known phrases.
 - Direct OpenAI-backed translation + examples as a fallback.
 
@@ -21,7 +21,6 @@ from random import choice
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import Flask, render_template, request, jsonify
-from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
@@ -44,12 +43,12 @@ CHROMA_DIR: Path = BASE_DIR / "chroma_db"
 COLLECTION_NAME: str = "phrases"
 
 # Retrieval behavior
-MIN_SIMILARITY: float = float(os.getenv("MIN_SIMILARITY", "0.60")) # minimum acceptable similarity (0–1)
-TOP_K: int = int(os.getenv("TOP_K", "5")) # how many nearest neighbors to inspect / suggest
-
+MIN_SIMILARITY: float = float(os.getenv("MIN_SIMILARITY", "0.60"))
+TOP_K: int = int(os.getenv("TOP_K", "5"))
 
 # Model config (can be overridden via environment)
 OPENAI_CHAT_MODEL: str = os.getenv("OPENAI_CHAT_MODEL", "gpt-4o-mini")
+OPENAI_EMBEDDING_MODEL: str = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 
 # ---------------------------------------------------------------------------
 # Load phrases
@@ -62,10 +61,40 @@ if not phrases:
     raise ValueError("phrases.json is empty – add some entries first.")
 
 # ---------------------------------------------------------------------------
-# Embedding model
+# OpenAI client
 # ---------------------------------------------------------------------------
 
-model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-mpnet-base-v2")
+def validate_environment():
+    """Validate required environment variables."""
+    if not os.getenv("OPENAI_API_KEY"):
+        raise EnvironmentError("OPENAI_API_KEY environment variable is required")
+
+validate_environment()
+
+oa_client = OpenAI()  # uses OPENAI_API_KEY from env
+
+
+# ---------------------------------------------------------------------------
+# Embeddings (OpenAI)
+# ---------------------------------------------------------------------------
+
+def get_embedding(text: str) -> List[float]:
+    """Get embedding from OpenAI."""
+    response = oa_client.embeddings.create(
+        model=OPENAI_EMBEDDING_MODEL,
+        input=text
+    )
+    return response.data[0].embedding
+
+
+def get_embeddings_batch(texts: List[str]) -> List[List[float]]:
+    """Get embeddings for multiple texts."""
+    response = oa_client.embeddings.create(
+        model=OPENAI_EMBEDDING_MODEL,
+        input=texts
+    )
+    return [item.embedding for item in response.data]
+
 
 # ---------------------------------------------------------------------------
 # Chroma client & index
@@ -110,7 +139,7 @@ def rebuild_index() -> chromadb.api.models.Collection.Collection:
             docs.append(variant)
             metadatas.append({"phrase_index": i, "source": "en_variant"})
 
-    embeddings = model.encode(docs, convert_to_numpy=True).tolist()
+    embeddings = get_embeddings_batch(docs)
 
     collection.add(
         ids=ids,
@@ -131,14 +160,16 @@ def rebuild_index() -> chromadb.api.models.Collection.Collection:
 
 def should_rebuild_index() -> bool:
     """Check if index needs rebuilding."""
-    if not CHROMA_DIR.exists():
+    try:
+        chroma_client.get_collection(name=COLLECTION_NAME)
+        # Collection exists, check if phrases.json is newer
+        if DATA_PATH.stat().st_mtime > CHROMA_DIR.stat().st_mtime:
+            return True
+        return False
+    except Exception:
+        # Collection doesn't exist
         return True
 
-    # Check if phrases.json is newer than chroma_db
-    if DATA_PATH.stat().st_mtime > CHROMA_DIR.stat().st_mtime:
-        return True
-
-    return False
 
 if should_rebuild_index():
     collection = rebuild_index()
@@ -147,19 +178,6 @@ else:
     collection = chroma_client.get_collection(name=COLLECTION_NAME)
     logger.info("Using existing Chroma collection '%s'.", COLLECTION_NAME)
 
-# ---------------------------------------------------------------------------
-# OpenAI client (for RAG + fallback generation)
-# ---------------------------------------------------------------------------
-
-def validate_environment():
-    """Validate required environment variables."""
-    if not os.getenv("OPENAI_API_KEY"):
-        raise EnvironmentError("OPENAI_API_KEY environment variable is required")
-
-validate_environment()
-
-oa_client = OpenAI()  # uses OPENAI_API_KEY from env
-
 
 # ---------------------------------------------------------------------------
 # Response Caching
@@ -167,13 +185,16 @@ oa_client = OpenAI()  # uses OPENAI_API_KEY from env
 
 _phrase_cache: Dict[str, Tuple[Dict[str, Any], Optional[str]]] = {}
 
+
 def cache_key(text: str) -> str:
     """Create cache key from input text."""
     return hashlib.md5(text.lower().strip().encode()).hexdigest()
 
+
 def get_cached_phrase(user_input: str) -> Optional[Tuple[Dict[str, Any], Optional[str]]]:
     """Get cached phrase if exists."""
     return _phrase_cache.get(cache_key(user_input))
+
 
 def set_cached_phrase(user_input: str, phrase: Dict[str, Any], explanation: Optional[str]):
     """Cache a phrase result (max 100 entries)."""
@@ -181,6 +202,10 @@ def set_cached_phrase(user_input: str, phrase: Dict[str, Any], explanation: Opti
         _phrase_cache.pop(next(iter(_phrase_cache)))
     _phrase_cache[cache_key(user_input)] = (phrase, explanation)
 
+
+# ---------------------------------------------------------------------------
+# RAG & Generation
+# ---------------------------------------------------------------------------
 
 def generate_rag_answer(user_input: str, phrase: Dict[str, Any]) -> Optional[str]:
     """
@@ -369,7 +394,7 @@ def query_corpus(q: str, top_k: int = TOP_K) -> Tuple[Optional[Dict[str, Any]], 
     if not q:
         return None, None, []
 
-    q_emb = model.encode([q], convert_to_numpy=True).tolist()
+    q_emb = [get_embedding(q)]
 
     res = collection.query(
         query_embeddings=q_emb,
@@ -408,6 +433,7 @@ def query_corpus(q: str, top_k: int = TOP_K) -> Tuple[Optional[Dict[str, Any]], 
 
 app = Flask(__name__)
 
+
 # ---------------------------------------------------------------------------
 # Rate Limiting
 # ---------------------------------------------------------------------------
@@ -438,6 +464,7 @@ class RateLimiter:
 
 
 rate_limiter = RateLimiter(max_requests=30, window_seconds=60)
+
 
 def get_client_id():
     """Get client identifier for rate limiting."""
@@ -484,7 +511,7 @@ def index():
     score: Optional[float] = None
     suggestions: List[str] = []
     rag_answer: Optional[str] = None
-    no_good_match: bool = False  # for template logic if you want to surface it
+    no_good_match: bool = False
 
     if request.method == "POST":
         action = request.form.get("action", "translate")
@@ -544,8 +571,8 @@ def index():
                     )
                     phrase, explanation = generate_direct_phrase(user_input)
                     result = phrase
-                    score = None          # don't show similarity pill
-                    suggestions = []      # hide suggestions in this path
+                    score = None
+                    suggestions = []
                     rag_answer = explanation
                     no_good_match = True
 
@@ -571,6 +598,7 @@ def index():
         rag_answer=rag_answer,
     )
 
+
 @app.route("/health", methods=["GET"])
 def health_check():
     """Health check endpoint for load balancers and monitoring."""
@@ -580,7 +608,7 @@ def health_check():
         "version": "0.1.0"
     })
 
+
 if __name__ == "__main__":
     debug = os.getenv("FLASK_DEBUG", "1") == "1"
     app.run(host="127.0.0.1", port=5000, debug=debug)
-
