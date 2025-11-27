@@ -25,6 +25,7 @@ from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
+import hashlib
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -160,6 +161,27 @@ validate_environment()
 oa_client = OpenAI()  # uses OPENAI_API_KEY from env
 
 
+# ---------------------------------------------------------------------------
+# Response Caching
+# ---------------------------------------------------------------------------
+
+_phrase_cache: Dict[str, Tuple[Dict[str, Any], Optional[str]]] = {}
+
+def cache_key(text: str) -> str:
+    """Create cache key from input text."""
+    return hashlib.md5(text.lower().strip().encode()).hexdigest()
+
+def get_cached_phrase(user_input: str) -> Optional[Tuple[Dict[str, Any], Optional[str]]]:
+    """Get cached phrase if exists."""
+    return _phrase_cache.get(cache_key(user_input))
+
+def set_cached_phrase(user_input: str, phrase: Dict[str, Any], explanation: Optional[str]):
+    """Cache a phrase result (max 100 entries)."""
+    if len(_phrase_cache) >= 100:
+        _phrase_cache.pop(next(iter(_phrase_cache)))
+    _phrase_cache[cache_key(user_input)] = (phrase, explanation)
+
+
 def generate_rag_answer(user_input: str, phrase: Dict[str, Any]) -> Optional[str]:
     """
     Explain / give usage based on a retrieved phrase (RAG style).
@@ -226,6 +248,12 @@ def generate_direct_phrase(user_input: str) -> Tuple[Optional[Dict[str, Any]], O
         phrase_dict: same shape as entries in phrases.json (or minimal fallback).
         explanation_text: explanation + examples, or None on failure.
     """
+
+    # Check cache first
+    cached = get_cached_phrase(user_input)
+    if cached:
+        logger.info("Cache hit for: %s", user_input)
+        return cached
 
     system_msg = (
         "You are a bilingual English–Mandarin–Thai assistant. "
@@ -308,6 +336,7 @@ You MUST return only valid JSON. No markdown, no comments, no extra text.
             explanation,
         )
 
+        set_cached_phrase(user_input, phrase, explanation)
         return phrase, explanation or None
 
     except Exception as e:

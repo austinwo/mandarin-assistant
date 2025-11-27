@@ -138,3 +138,24 @@ def test_sanitize_input_handles_empty():
     from app import sanitize_input
     assert sanitize_input("") == ""
     assert sanitize_input(None) == ""
+
+
+def test_phrase_cache_stores_and_retrieves():
+    """Cache should store and retrieve phrases."""
+    from app import get_cached_phrase, set_cached_phrase
+
+    set_cached_phrase("hello", {"en": "hello", "zh": "你好"}, "greeting")
+    result = get_cached_phrase("hello")
+
+    assert result is not None
+    assert result[0]["zh"] == "你好"
+
+
+def test_phrase_cache_normalizes_input():
+    """Cache should treat 'Hello' and 'hello' the same."""
+    from app import get_cached_phrase, set_cached_phrase
+
+    set_cached_phrase("Hello", {"en": "hello"}, None)
+    result = get_cached_phrase("  hello  ")
+
+    assert result is not None
