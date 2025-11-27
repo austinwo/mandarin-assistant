@@ -126,7 +126,23 @@ def rebuild_index() -> chromadb.api.models.Collection.Collection:
     return collection
 
 
-collection = rebuild_index()
+def should_rebuild_index() -> bool:
+    """Check if index needs rebuilding."""
+    if not CHROMA_DIR.exists():
+        return True
+
+    # Check if phrases.json is newer than chroma_db
+    if DATA_PATH.stat().st_mtime > CHROMA_DIR.stat().st_mtime:
+        return True
+
+    return False
+
+if should_rebuild_index():
+    collection = rebuild_index()
+    logger.info("Index rebuilt.")
+else:
+    collection = chroma_client.get_collection(name=COLLECTION_NAME)
+    logger.info("Using existing Chroma collection '%s'.", COLLECTION_NAME)
 
 # ---------------------------------------------------------------------------
 # OpenAI client (for RAG + fallback generation)
