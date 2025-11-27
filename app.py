@@ -430,6 +430,23 @@ def rate_limit(f):
     return decorated_function
 
 
+def sanitize_input(text: str) -> str:
+    """
+    Sanitize user input by removing control characters and normalizing whitespace.
+    """
+    import re
+    if not text:
+        return ""
+    
+    # Remove control characters (keep normal whitespace)
+    cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', ' ', text)
+    
+    # Normalize whitespace
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
+    return cleaned
+
+
 @app.route("/", methods=["GET", "POST"])
 @rate_limit
 def index():
@@ -458,7 +475,7 @@ def index():
             # Normal translate flow.
             MAX_INPUT_LENGTH = 500
 
-            user_input = request.form.get("query", "").strip()
+            user_input = sanitize_input(request.form.get("query", ""))
 
             # Input validation
             if not user_input:

@@ -117,3 +117,24 @@ def test_rate_limiter_blocks_over_limit():
         limiter.is_allowed("test-client")
     
     assert limiter.is_allowed("test-client") is False
+
+
+def test_sanitize_input_removes_control_chars():
+    """Control characters should be removed."""
+    from app import sanitize_input
+    result = sanitize_input("hello\x00world")
+    assert result == "hello world"
+
+
+def test_sanitize_input_normalizes_whitespace():
+    """Multiple spaces should collapse to one."""
+    from app import sanitize_input
+    result = sanitize_input("hello    world")
+    assert result == "hello world"
+
+
+def test_sanitize_input_handles_empty():
+    """Empty string should return empty."""
+    from app import sanitize_input
+    assert sanitize_input("") == ""
+    assert sanitize_input(None) == ""
