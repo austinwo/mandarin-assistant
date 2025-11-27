@@ -11,6 +11,8 @@ Designed as a small but realistic AI product surface:
 - Clear separation of concerns
 """
 
+from collections import defaultdict
+import time
 import json
 import logging
 import os
@@ -370,8 +372,59 @@ def query_corpus(q: str, top_k: int = TOP_K) -> Tuple[Optional[Dict[str, Any]], 
 
 app = Flask(__name__)
 
+# ---------------------------------------------------------------------------
+# Rate Limiting
+# ---------------------------------------------------------------------------
+
+class RateLimiter:
+    """Simple in-memory rate limiter using sliding window."""
+    
+    def __init__(self, max_requests: int = 30, window_seconds: int = 60):
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self.requests = defaultdict(list)
+    
+    def is_allowed(self, client_id: str) -> bool:
+        """Check if request is allowed for given client."""
+        now = time.time()
+        window_start = now - self.window_seconds
+        
+        # Clean old requests
+        self.requests[client_id] = [
+            t for t in self.requests[client_id] if t > window_start
+        ]
+        
+        if len(self.requests[client_id]) >= self.max_requests:
+            return False
+        
+        self.requests[client_id].append(now)
+        return True
+
+
+rate_limiter = RateLimiter(max_requests=30, window_seconds=60)
+
+def get_client_id():
+    """Get client identifier for rate limiting."""
+    return request.headers.get("X-Forwarded-For", request.remote_addr or "unknown")
+
+
+def rate_limit(f):
+    """Decorator to apply rate limiting to routes."""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        client_id = get_client_id()
+        if not rate_limiter.is_allowed(client_id):
+            return render_template(
+                "index.html",
+                error="Too many requests. Please wait a moment and try again."
+            ), 429
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route("/", methods=["GET", "POST"])
+@rate_limit
 def index():
     user_input: str = ""
     result: Optional[Dict[str, Any]] = None
@@ -477,3 +530,4 @@ def health_check():
 if __name__ == "__main__":
     debug = os.getenv("FLASK_DEBUG", "1") == "1"
     app.run(host="127.0.0.1", port=5000, debug=debug)
+

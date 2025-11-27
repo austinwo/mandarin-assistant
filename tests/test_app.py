@@ -90,3 +90,23 @@ def test_health_returns_200(app_client):
     assert response.status_code == 200
     data = json.loads(response.data)
     assert data["status"] == "healthy"
+
+
+def test_rate_limiter_allows_under_limit():
+    """Requests under limit should be allowed."""
+    from app import RateLimiter
+    limiter = RateLimiter(max_requests=5, window_seconds=60)
+    
+    for _ in range(5):
+        assert limiter.is_allowed("test-client") is True
+
+
+def test_rate_limiter_blocks_over_limit():
+    """Requests over limit should be blocked."""
+    from app import RateLimiter
+    limiter = RateLimiter(max_requests=3, window_seconds=60)
+    
+    for _ in range(3):
+        limiter.is_allowed("test-client")
+    
+    assert limiter.is_allowed("test-client") is False
