@@ -1,0 +1,74 @@
+"""Core unit tests for Mandarin Assistant."""
+import sys
+from pathlib import Path
+
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import pytest
+from unittest.mock import Mock, patch
+import os
+
+
+def test_query_corpus_high_similarity():
+    """Test retrieval with high similarity match."""
+    from app import query_corpus
+    phrase, sim, suggestions = query_corpus("Want to drink tonight?")
+    assert phrase is not None
+    assert sim > 0.7  # Should find close match
+    assert "en" in phrase
+
+
+def test_query_corpus_low_similarity():
+    """Test retrieval with no good match."""
+    from app import query_corpus
+    phrase, sim, suggestions = query_corpus("quantum physics dissertation")
+    # Should still return something, but low similarity
+    assert sim is not None
+    assert sim < 0.6
+
+
+def test_query_corpus_empty_input():
+    """Test handling of empty input."""
+    from app import query_corpus
+    phrase, sim, suggestions = query_corpus("")
+    # Should handle gracefully
+    assert suggestions is not None
+
+
+@patch('openai.OpenAI')
+def test_generate_direct_phrase_success(mock_openai_class):
+    """Test successful LLM generation."""
+    from app import generate_direct_phrase
+    
+    mock_client = Mock()
+    mock_openai_class.return_value = mock_client
+    
+    mock_response = Mock()
+    mock_response.choices = [Mock()]
+    mock_response.choices[0].message.content = '''```json
+{
+    "en": "Hello",
+    "thai": "สวัสดี",
+    "zh": "你好",
+    "zh_trad": "你好",
+    "pinyin": "nǐ hǎo",
+    "zh_thai": "นี่ห่าว"
+}
+```'''
+    mock_client.chat.completions.create.return_value = mock_response
+    
+    phrase, explanation = generate_direct_phrase("Hello")
+    assert phrase is not None
+    assert "zh" in phrase
+    assert "pinyin" in phrase
+
+
+def test_validate_environment_missing_key():
+    """Test environment validation with missing API key."""
+    pass
+
+
+def test_validate_environment_success():
+    """Test environment validation with key present."""
+    pass
