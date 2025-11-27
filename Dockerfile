@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
 # Install Poetry
 RUN pip install poetry==2.2.1
 
+# Install CPU-only PyTorch first (smaller than default GPU build)
+RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
+
 # Copy dependency files
 COPY pyproject.toml poetry.lock ./
 
