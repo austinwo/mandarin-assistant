@@ -1,3 +1,6 @@
+<img width="823" height="1063" alt="image" src="https://github.com/user-attachments/assets/a392ebd4-3761-489e-96f7-3647eda24a13" />
+
+
 # Mandarin AI — Write English Like Yourself, Get Mandarin Like a Local
 
 Learn how Chinese speakers actually talk — not how textbooks translate.
