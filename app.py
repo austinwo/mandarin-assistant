@@ -150,6 +150,13 @@ else:
 # OpenAI client (for RAG + fallback generation)
 # ---------------------------------------------------------------------------
 
+def validate_environment():
+    """Validate required environment variables."""
+    if not os.getenv("OPENAI_API_KEY"):
+        raise EnvironmentError("OPENAI_API_KEY environment variable is required")
+
+validate_environment()
+
 oa_client = OpenAI()  # uses OPENAI_API_KEY from env
 
 

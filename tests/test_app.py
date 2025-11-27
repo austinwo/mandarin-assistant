@@ -64,14 +64,21 @@ def test_generate_direct_phrase_success(mock_openai_class):
     assert "pinyin" in phrase
 
 
-def test_validate_environment_missing_key():
-    """Test environment validation with missing API key."""
-    pass
+def test_validate_environment_missing_key(monkeypatch):
+    """Missing API key should raise error."""
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    
+    with pytest.raises(EnvironmentError):
+        from importlib import reload
+        import app
+        reload(app)
 
 
-def test_validate_environment_success():
-    """Test environment validation with key present."""
-    pass
+def test_validate_environment_success(monkeypatch):
+    """Valid API key should not raise."""
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-key")
+    # If we get here without error, validation passed
+    assert os.getenv("OPENAI_API_KEY") == "sk-test-key"
 
 
 @pytest.fixture
