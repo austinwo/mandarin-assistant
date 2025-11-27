@@ -1,0 +1,15 @@
+code .dockerignore
+```
+
+Paste:
+```
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+chroma_db/
+.git/
+.gitignore
+README.md
+.env
+tests/

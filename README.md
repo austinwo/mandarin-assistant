@@ -40,16 +40,16 @@ The outcome is real-world Mandarin phrasing that matches how native speakers wou
 # 🔥 Architecture Overview
 
 ### UI Layer (Flask + Bootstrap)
-- English input
-- “Translate”
-- “🎲 Inspire me”
-- Loading state
+- English input with validation
+- "Translate" + "🎲 Inspire me" actions
+- Loading states and error handling
 - Prior output cleared during inference
 
 ### Retrieval Layer (Chroma + MPNet)
 - `sentence-transformers/paraphrase-multilingual-mpnet-base-v2`
 - Multilingual semantic embeddings
 - k-nearest neighbor cosine similarity
+- Conditional index rebuild (only when phrases.json changes)
 - Operates without LLM cost for high-confidence matches
 
 ### LLM Layer (OpenAI)
@@ -61,10 +61,10 @@ The outcome is real-world Mandarin phrasing that matches how native speakers wou
   - Thai phonetics
   - Mandarin + English usage examples
 
-### Orchestration
-- Retrieval anchors the phrasing
-- Generation only extends or interpolates
-- The system avoids literal translation and uncontrolled creativity
+### Deployment
+- **Production:** Gunicorn WSGI server
+- **Containerization:** Docker
+- **Testing:** pytest with mocking
 
 ---
 
@@ -85,9 +85,16 @@ The outcome is real-world Mandarin phrasing that matches how native speakers wou
 
 # 🛠️ Setup
 
+## Local Development
+
 Install dependencies:
 ```bash
 poetry install
+```
+
+Run tests:
+```bash
+poetry run pytest tests/ -v
 ```
 
 ---
@@ -97,6 +104,12 @@ poetry install
 macOS / Linux / WSL:
 ```bash
 export OPENAI_API_KEY="sk-xxxx"
+```
+
+Or add to `~/.bashrc` for persistence:
+```bash
+echo 'export OPENAI_API_KEY="sk-xxxx"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 Windows PowerShell:
@@ -109,6 +122,8 @@ Restart your terminal — no `.env` required.
 ---
 
 # ▶️ Run the app
+
+## Local Development
 ```bash
 poetry run python app.py
 ```
@@ -117,6 +132,27 @@ Visit:
 ```
 http://127.0.0.1:5000
 ```
+
+## Docker Deployment
+
+Build the image:
+```bash
+docker build -t mandarin-assistant .
+```
+
+Run the container:
+```bash
+docker run -e OPENAI_API_KEY="your-key-here" -p 5000:5000 mandarin-assistant
+```
+
+Access at http://localhost:5000
+
+### Environment Variables
+
+Required:
+- `OPENAI_API_KEY` - Your OpenAI API key
+
+See `.env.example` for reference.
 
 ---
 
@@ -136,9 +172,15 @@ Output includes:
 - Usage examples in both Mandarin + English
 
 ### 2. 🎲 Inspiration mode
-Shows real-life Mandarin examples when users don’t know what to ask.
+Shows real-life Mandarin examples when users don't know what to ask.
 
-### 3. UX design around LLMs
+### 3. Input validation & error handling
+- Maximum input length (500 characters)
+- Empty input detection
+- User-friendly error messages
+- Graceful degradation on LLM failures
+
+### 4. UX design around LLMs
 - Results hidden while generating
 - Buttons disabled during inference
 - Loading indicator
@@ -169,11 +211,26 @@ Graceful degradation > hard failures.
 
 ---
 
+# 🧪 Testing
+
+Run the test suite:
+```bash
+poetry run pytest tests/ -v
+```
+
+Current test coverage:
+- Query corpus retrieval (high/low similarity)
+- Empty input handling
+- LLM generation with mocking
+- Input validation
+
+---
+
 # 📈 Future Roadmap
 
 **1. Personalized memory**
 - Store user embeddings to build a language profile over time
-- Adapt tone and phrasing to each learner’s style
+- Adapt tone and phrasing to each learner's style
 
 **2. Speech mode**
 - Whisper input → Mandarin TTS output
@@ -192,3 +249,9 @@ Graceful degradation > hard failures.
 - Multi-turn context retention
 - Travel, social, and practical domains
 - Persona-aware phrasing
+
+**6. Production enhancements**
+- Rate limiting
+- Request caching
+- CI/CD pipeline
+- Monitoring and observability
