@@ -18,7 +18,7 @@ from pathlib import Path
 from random import choice
 from typing import Any, Dict, List, Optional, Tuple
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
@@ -465,6 +465,14 @@ def index():
         rag_answer=rag_answer,
     )
 
+@app.route("/health", methods=["GET"])
+def health_check():
+    """Health check endpoint for load balancers and monitoring."""
+    return jsonify({
+        "status": "healthy",
+        "service": "mandarin-assistant",
+        "version": "0.1.0"
+    })
 
 if __name__ == "__main__":
     debug = os.getenv("FLASK_DEBUG", "1") == "1"

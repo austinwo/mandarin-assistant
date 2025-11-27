@@ -72,3 +72,21 @@ def test_validate_environment_missing_key():
 def test_validate_environment_success():
     """Test environment validation with key present."""
     pass
+
+
+@pytest.fixture
+def app_client():
+    """Create Flask test client."""
+    from app import app
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
+
+
+def test_health_returns_200(app_client):
+    """Health check should return 200 OK."""
+    import json
+    response = app_client.get("/health")
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data["status"] == "healthy"
